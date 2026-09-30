@@ -141,7 +141,9 @@
     .sign-line { width: min(40%, 180px); border-top: 1px solid #a9b6a9; padding-top: 8px; color: #7e8c80; font-size: 11px; text-align: center; }
     .signature { min-width: 155px; min-height: 44px; border-bottom: 1px solid #a9b6a9; color: #1d6a4e; font-family: "Brush Script MT", "Segoe Script", cursive; font-size: clamp(20px, 2.5vw, 29px); font-style: italic; text-align: center; opacity: 0; transform: rotate(-6deg) translateY(8px); transition: opacity .3s, transform .5s; }
     .signed .signature { opacity: 1; transform: rotate(-6deg) translateY(0); }
-    .flying-pen { position: fixed; z-index: 10; pointer-events: none; filter: drop-shadow(15px 20px 12px #071e1859); }
+    .flying-pen, .signed-pen { z-index: 10; pointer-events: none; filter: drop-shadow(15px 20px 12px #071e1859); }
+    .flying-pen { position: fixed; }
+    .signed-pen { position: absolute; }
     .stamp { position: absolute; z-index: 2; right: clamp(22px, 3.5vw, 51px); bottom: clamp(88px, 10vw, 115px); display: grid; width: clamp(90px, 12vw, 125px); aspect-ratio: 1; place-items: center; border: 5px double #b84a3d; border-radius: 50%; color: #b84a3d; font-size: clamp(13px, 1.65vw, 18px); font-weight: 950; line-height: 1.15; text-align: center; text-transform: uppercase; opacity: 0; transform: rotate(-15deg) scale(1.7); transition: opacity .35s, transform .55s cubic-bezier(.18,.9,.3,1.2); pointer-events: none; }
     .signed .stamp { opacity: .9; transform: rotate(-15deg) scale(1); }
 
@@ -287,6 +289,7 @@
     const again = document.getElementById('again');
     const pen = document.querySelector('.pen-illustration');
     const signature = document.querySelector('.signature');
+    const contract = document.querySelector('.contract');
     let flight = null;
     let flyingPen = null;
     let signing = false;
@@ -325,6 +328,18 @@
       app.classList.remove('signing', 'signed');
     }
 
+    function positionSignedPen() {
+      if (!flyingPen || !app.classList.contains('signed')) return;
+      const contractBox = contract.getBoundingClientRect();
+      const signatureBox = signature.getBoundingClientRect();
+      const size = Math.min(pen.getBoundingClientRect().width * .58, 145);
+      Object.assign(flyingPen.style, {
+        left: `${signatureBox.left + signatureBox.width / 2 - contractBox.left - size / 2}px`,
+        top: `${signatureBox.top + signatureBox.height / 2 - contractBox.top - size * .92}px`,
+        width: `${size}px`, height: `${size}px`, transform: 'rotate(-31deg)'
+      });
+    }
+
     function startSigning() {
       if (signing || app.classList.contains('signed')) return;
       signing = true;
@@ -340,7 +355,7 @@
       const from = pen.getBoundingClientRect();
       const to = signature.getBoundingClientRect();
       const dx = to.left + to.width / 2 - (from.left + from.width / 2);
-      const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+      const dy = to.top + to.height / 2 - (from.top + from.height / 2) - from.height * .244;
       flyingPen = pen.cloneNode(true);
       flyingPen.classList.remove('pen-illustration');
       flyingPen.classList.add('flying-pen');
@@ -360,10 +375,13 @@
         { transform: `translate(${dx}px, ${dy}px) rotate(-31deg) scale(.58)`, offset: 1 }
       ], { duration: 1450, easing: 'cubic-bezier(.22,.7,.2,1)', fill: 'forwards' });
       flight.onfinish = () => {
-        flyingPen.style.transform = `translate(${dx}px, ${dy}px) rotate(-31deg) scale(.58)`;
         flight.cancel();
         flight = null;
         finishSigning();
+        flyingPen.classList.remove('flying-pen');
+        flyingPen.classList.add('signed-pen');
+        contract.appendChild(flyingPen);
+        positionSignedPen();
       };
     }
 
@@ -387,6 +405,7 @@
 
     slider.addEventListener('input', update);
     again.addEventListener('click', () => { slider.value = '100'; update(); slider.focus(); });
+    window.addEventListener('resize', positionSignedPen);
     update();
   </script>
 </body>
