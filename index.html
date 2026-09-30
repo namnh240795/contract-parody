@@ -40,15 +40,6 @@
     .page::after { right: -23vw; bottom: -30vw; background: #e1e9d7; }
 
     .app { width: min(1120px, 100%); }
-    .eyebrow {
-      margin: 0 0 12px;
-      color: #648074;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .18em;
-      text-align: center;
-      text-transform: uppercase;
-    }
     h1 {
       margin: 0;
       font-size: clamp(30px, 5vw, 62px);
@@ -106,7 +97,7 @@
       filter: drop-shadow(15px 20px 12px #071e1859);
       transition: transform .7s cubic-bezier(.2,.8,.2,1);
     }
-    .signed .pen-illustration { transform: translate(-37%, -39%) rotate(-31deg); }
+    .signing .pen-illustration { opacity: 0; }
     .pen-foot { position: relative; z-index: 1; margin: 0; padding: 0 clamp(21px, 3vw, 33px) 27px; color: #c5d7ca; font-size: 13px; line-height: 1.45; }
 
     .contract-wrap { position: relative; padding: 12px; border: 1px solid #ded6c6; border-radius: 25px; background: #e9e1d1; box-shadow: 0 16px 35px #5e503722; }
@@ -150,6 +141,7 @@
     .sign-line { width: min(40%, 180px); border-top: 1px solid #a9b6a9; padding-top: 8px; color: #7e8c80; font-size: 11px; text-align: center; }
     .signature { min-width: 155px; min-height: 44px; border-bottom: 1px solid #a9b6a9; color: #1d6a4e; font-family: "Brush Script MT", "Segoe Script", cursive; font-size: clamp(20px, 2.5vw, 29px); font-style: italic; text-align: center; opacity: 0; transform: rotate(-6deg) translateY(8px); transition: opacity .3s, transform .5s; }
     .signed .signature { opacity: 1; transform: rotate(-6deg) translateY(0); }
+    .flying-pen { position: fixed; z-index: 10; pointer-events: none; filter: drop-shadow(15px 20px 12px #071e1859); }
     .stamp { position: absolute; z-index: 2; right: clamp(22px, 3.5vw, 51px); bottom: clamp(88px, 10vw, 115px); display: grid; width: clamp(90px, 12vw, 125px); aspect-ratio: 1; place-items: center; border: 5px double #b84a3d; border-radius: 50%; color: #b84a3d; font-size: clamp(13px, 1.65vw, 18px); font-weight: 950; line-height: 1.15; text-align: center; text-transform: uppercase; opacity: 0; transform: rotate(-15deg) scale(1.7); transition: opacity .35s, transform .55s cubic-bezier(.18,.9,.3,1.2); pointer-events: none; }
     .signed .stamp { opacity: .9; transform: rotate(-15deg) scale(1); }
 
@@ -232,7 +224,6 @@
 <body>
   <main class="page" id="page">
     <div class="app" id="app">
-      <p class="eyebrow">Trò đùa văn phòng • 100% hư cấu</p>
       <h1>Ký hợp đồng lương</h1>
       <p class="subtitle">Một chiếc bút, một bản hợp đồng, và một cú kéo khiến phòng nhân sự mỉm cười.</p>
 
@@ -293,7 +284,11 @@
     const status = document.getElementById('status');
     const hint = document.getElementById('hint');
     const again = document.getElementById('again');
-    let celebrated = false;
+    const pen = document.querySelector('.pen-illustration');
+    const signature = document.querySelector('.signature');
+    let flight = null;
+    let flyingPen = null;
+    let signing = false;
 
     function confetti() {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -310,24 +305,83 @@
       }
     }
 
+    function finishSigning() {
+      if (Number(slider.value) !== 5) return;
+      signing = false;
+      app.classList.remove('signing');
+      app.classList.add('signed');
+      status.innerHTML = '<strong>🎉 Ký hợp đồng thành công!</strong> Mức lương: 5 triệu/tháng.';
+      hint.textContent = 'Phòng nhân sự đã bấm nút đồng ý trong 0,001 giây.';
+      confetti();
+    }
+
+    function cancelSigning() {
+      if (flight) flight.cancel();
+      if (flyingPen) flyingPen.remove();
+      flight = null;
+      flyingPen = null;
+      signing = false;
+      app.classList.remove('signing', 'signed');
+    }
+
+    function startSigning() {
+      if (signing || app.classList.contains('signed')) return;
+      signing = true;
+      app.classList.add('signing');
+      status.textContent = 'Bút đang di chuyển đến ô chữ ký…';
+      hint.textContent = 'Chuẩn bị ký hợp đồng ✍️';
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        finishSigning();
+        return;
+      }
+
+      const from = pen.getBoundingClientRect();
+      const to = signature.getBoundingClientRect();
+      const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+      const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+      flyingPen = pen.cloneNode(true);
+      flyingPen.classList.remove('pen-illustration');
+      flyingPen.classList.add('flying-pen');
+      flyingPen.setAttribute('aria-hidden', 'true');
+      Object.assign(flyingPen.style, {
+        left: `${from.left}px`, top: `${from.top}px`,
+        width: `${from.width}px`, height: `${from.height}px`
+      });
+      document.body.appendChild(flyingPen);
+
+      flight = flyingPen.animate([
+        { transform: 'translate(0, 0) rotate(-17deg)', offset: 0 },
+        { transform: `translate(${dx * .75}px, ${dy * .75}px) rotate(-26deg)`, offset: .48 },
+        { transform: `translate(${dx}px, ${dy}px) rotate(-31deg)`, offset: .67 },
+        { transform: `translate(${dx + 13}px, ${dy - 5}px) rotate(-37deg)`, offset: .79 },
+        { transform: `translate(${dx - 10}px, ${dy + 4}px) rotate(-27deg)`, offset: .9 },
+        { transform: `translate(${dx}px, ${dy}px) rotate(-31deg)`, opacity: 0, offset: 1 }
+      ], { duration: 1450, easing: 'cubic-bezier(.22,.7,.2,1)', fill: 'forwards' });
+      flight.onfinish = () => {
+        flyingPen.remove();
+        flyingPen = null;
+        flight = null;
+        finishSigning();
+      };
+    }
+
     function update() {
       const value = Number(slider.value);
-      const signed = value === 5;
       slider.style.setProperty('--progress', `${((value - 5) / 95) * 100}%`);
       salaryValue.textContent = `${value} triệu`;
-      app.classList.toggle('signed', signed);
-      if (signed) {
-        status.innerHTML = '<strong>🎉 Ký hợp đồng thành công!</strong> Mức lương: 5 triệu/tháng.';
-        hint.textContent = 'Phòng nhân sự đã bấm nút đồng ý trong 0,001 giây.';
-        if (!celebrated) confetti();
-      } else if (value < 100) {
+      if (value === 5) {
+        startSigning();
+      } else {
+        if (signing || app.classList.contains('signed')) cancelSigning();
+        if (value < 100) {
         status.textContent = `Còn ${value - 5} triệu nữa là hợp đồng tự ký!`;
         hint.textContent = 'Tiếp tục kéo sang trái ←';
-      } else {
-        status.textContent = 'Phòng nhân sự đang nín thở chờ bạn kéo thanh lương…';
-        hint.textContent = 'Bắt đầu từ bên phải → kéo hết sang trái';
+        } else {
+          status.textContent = 'Phòng nhân sự đang nín thở chờ bạn kéo thanh lương…';
+          hint.textContent = 'Bắt đầu từ bên phải → kéo hết sang trái';
+        }
       }
-      celebrated = signed;
     }
 
     slider.addEventListener('input', update);
