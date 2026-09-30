@@ -97,7 +97,7 @@
       filter: drop-shadow(15px 20px 12px #071e1859);
       transition: transform .7s cubic-bezier(.2,.8,.2,1);
     }
-    .signing .pen-illustration { opacity: 0; }
+    .signing .pen-illustration, .signed .pen-illustration { opacity: 0; }
     .pen-foot { position: relative; z-index: 1; margin: 0; padding: 0 clamp(21px, 3vw, 33px) 27px; color: #c5d7ca; font-size: 13px; line-height: 1.45; }
 
     .contract-wrap { position: relative; padding: 12px; border: 1px solid #ded6c6; border-radius: 25px; background: #e9e1d1; box-shadow: 0 16px 35px #5e503722; }
@@ -218,6 +218,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      .signed .pen-illustration { opacity: 1; }
     }
   </style>
 </head>
@@ -356,11 +357,11 @@
         { transform: `translate(${dx}px, ${dy}px) rotate(-31deg)`, offset: .67 },
         { transform: `translate(${dx + 13}px, ${dy - 5}px) rotate(-37deg)`, offset: .79 },
         { transform: `translate(${dx - 10}px, ${dy + 4}px) rotate(-27deg)`, offset: .9 },
-        { transform: `translate(${dx}px, ${dy}px) rotate(-31deg)`, opacity: 0, offset: 1 }
+        { transform: `translate(${dx}px, ${dy}px) rotate(-31deg) scale(.58)`, offset: 1 }
       ], { duration: 1450, easing: 'cubic-bezier(.22,.7,.2,1)', fill: 'forwards' });
       flight.onfinish = () => {
-        flyingPen.remove();
-        flyingPen = null;
+        flyingPen.style.transform = `translate(${dx}px, ${dy}px) rotate(-31deg) scale(.58)`;
+        flight.cancel();
         flight = null;
         finishSigning();
       };
