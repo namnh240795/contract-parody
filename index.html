@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f1e8">
+  <title>Hợp đồng lương — ký là chốt!</title>
+  <style>
+    :root {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #17372f;
+      background: #f6f1e8;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; overflow-x: hidden; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .page {
+      position: relative;
+      display: grid;
+      min-height: 100vh;
+      place-items: center;
+      padding: clamp(18px, 4vw, 48px);
+      isolation: isolate;
+    }
+    .page::before, .page::after {
+      position: fixed;
+      z-index: -1;
+      width: 42vw;
+      height: 42vw;
+      border-radius: 50%;
+      content: "";
+      filter: blur(8px);
+      pointer-events: none;
+    }
+    .page::before { top: -25vw; left: -12vw; background: #e6dcc8; }
+    .page::after { right: -23vw; bottom: -30vw; background: #e1e9d7; }
+
+    .app { width: min(1120px, 100%); }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #648074;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 62px);
+      line-height: 1.06;
+      letter-spacing: -.055em;
+      text-align: center;
+    }
+    .subtitle {
+      margin: 15px auto 31px;
+      color: #64766e;
+      font-size: clamp(14px, 1.7vw, 17px);
+      line-height: 1.55;
+      text-align: center;
+    }
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(225px, .78fr) minmax(0, 1.22fr);
+      gap: clamp(12px, 2.4vw, 28px);
+      align-items: stretch;
+    }
+    .pen-card, .contract-wrap { min-width: 0; }
+    .pen-card {
+      position: relative;
+      display: flex;
+      min-height: 430px;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      border: 1px solid #204c40;
+      border-radius: 25px;
+      background: #173f35;
+      color: #fff9e8;
+      box-shadow: 0 16px 35px #254a3d20;
+    }
+    .pen-card::before {
+      position: absolute;
+      top: -102px;
+      right: -116px;
+      width: 300px;
+      height: 300px;
+      border: 1px solid #ffffff25;
+      border-radius: 50%;
+      box-shadow: 0 0 0 50px #ffffff0a, 0 0 0 105px #ffffff07;
+      content: "";
+    }
+    .card-top { position: relative; z-index: 1; padding: clamp(21px, 3vw, 33px); }
+    .mini-label { color: #bed5ba; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .pen-title { margin: 12px 0 0; font-size: clamp(24px, 3vw, 35px); font-weight: 750; line-height: 1.13; letter-spacing: -.04em; }
+    .pen-illustration {
+      position: absolute;
+      top: 52%;
+      left: 51%;
+      width: min(80%, 280px);
+      transform: translate(-50%, -50%) rotate(-17deg);
+      filter: drop-shadow(15px 20px 12px #071e1859);
+      transition: transform .7s cubic-bezier(.2,.8,.2,1);
+    }
+    .signed .pen-illustration { transform: translate(-37%, -39%) rotate(-31deg); }
+    .pen-foot { position: relative; z-index: 1; margin: 0; padding: 0 clamp(21px, 3vw, 33px) 27px; color: #c5d7ca; font-size: 13px; line-height: 1.45; }
+
+    .contract-wrap { position: relative; padding: 12px; border: 1px solid #ded6c6; border-radius: 25px; background: #e9e1d1; box-shadow: 0 16px 35px #5e503722; }
+    .contract {
+      position: relative;
+      display: flex;
+      min-height: 406px;
+      height: 100%;
+      flex-direction: column;
+      padding: clamp(22px, 3.2vw, 39px);
+      overflow: hidden;
+      border: 1px solid #e1d9c9;
+      border-radius: 15px;
+      background: #fffefa;
+      box-shadow: 0 4px 8px #5448360d;
+    }
+    .contract::after {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 30px;
+      width: 1px;
+      background: #e9baa740;
+      content: "";
+    }
+    .contract-head { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+    .brand { color: #2c6651; font-size: 13px; font-weight: 900; letter-spacing: .11em; }
+    .doc-no { color: #8b968c; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+    .rule { height: 2px; margin: 21px 0 25px; background: #20533f; }
+    .contract h2 { margin: 0; font-size: clamp(22px, 2.8vw, 34px); letter-spacing: -.045em; line-height: 1.15; }
+    .contract-copy { margin: 11px 0 20px; color: #77827c; font-size: 14px; line-height: 1.5; }
+    .salary-box { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 17px 19px; border: 1px solid #d8e3d7; border-radius: 13px; background: #f2f7ef; }
+    .salary-box span:first-child { color: #698071; font-size: 12px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    .salary-value { color: #205e44; font-size: clamp(20px, 3vw, 32px); font-weight: 900; letter-spacing: -.04em; white-space: nowrap; }
+    .contract-lines { display: grid; gap: 12px; margin: 27px 0 12px; }
+    .contract-lines span { display: block; height: 8px; border-radius: 8px; background: #ecece6; }
+    .contract-lines span:nth-child(1) { width: 95%; }
+    .contract-lines span:nth-child(2) { width: 79%; }
+    .contract-lines span:nth-child(3) { width: 88%; }
+    .sign-area { display: flex; gap: 18px; justify-content: space-between; align-items: end; margin-top: auto; padding-top: 19px; }
+    .sign-line { width: min(40%, 180px); border-top: 1px solid #a9b6a9; padding-top: 8px; color: #7e8c80; font-size: 11px; text-align: center; }
+    .signature { min-width: 155px; min-height: 44px; border-bottom: 1px solid #a9b6a9; color: #1d6a4e; font-family: "Brush Script MT", "Segoe Script", cursive; font-size: clamp(20px, 2.5vw, 29px); font-style: italic; text-align: center; opacity: 0; transform: rotate(-6deg) translateY(8px); transition: opacity .3s, transform .5s; }
+    .signed .signature { opacity: 1; transform: rotate(-6deg) translateY(0); }
+    .stamp { position: absolute; z-index: 2; right: clamp(22px, 3.5vw, 51px); bottom: clamp(88px, 10vw, 115px); display: grid; width: clamp(90px, 12vw, 125px); aspect-ratio: 1; place-items: center; border: 5px double #b84a3d; border-radius: 50%; color: #b84a3d; font-size: clamp(13px, 1.65vw, 18px); font-weight: 950; line-height: 1.15; text-align: center; text-transform: uppercase; opacity: 0; transform: rotate(-15deg) scale(1.7); transition: opacity .35s, transform .55s cubic-bezier(.18,.9,.3,1.2); pointer-events: none; }
+    .signed .stamp { opacity: .9; transform: rotate(-15deg) scale(1); }
+
+    .control {
+      margin-top: 21px;
+      padding: clamp(21px, 3vw, 30px);
+      border: 1px solid #ddd9cd;
+      border-radius: 22px;
+      background: #fffefa;
+      box-shadow: 0 12px 30px #6259400c;
+    }
+    .control-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; margin-bottom: 13px; }
+    .control h2 { margin: 0; font-size: clamp(17px, 2vw, 21px); letter-spacing: -.025em; }
+    .hint { color: #758279; font-size: 13px; text-align: right; }
+    .range-wrap { position: relative; padding: 10px 0 5px; }
+    input[type="range"] {
+      display: block;
+      width: 100%;
+      height: 16px;
+      margin: 0;
+      border-radius: 999px;
+      background: linear-gradient(to right, #2b7658 0 var(--progress), #e2e6df var(--progress) 100%);
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: grab;
+      touch-action: none;
+    }
+    input[type="range"]:active { cursor: grabbing; }
+    input[type="range"]::-webkit-slider-thumb { width: 32px; height: 32px; border: 5px solid #fffefa; border-radius: 50%; background: #1f6249; box-shadow: 0 2px 8px #123b2a55; appearance: none; -webkit-appearance: none; }
+    input[type="range"]::-moz-range-thumb { width: 23px; height: 23px; border: 5px solid #fffefa; border-radius: 50%; background: #1f6249; box-shadow: 0 2px 8px #123b2a55; }
+    input[type="range"]:focus-visible { outline: 3px solid #b1802d; outline-offset: 7px; }
+    .range-labels { display: flex; justify-content: space-between; margin-top: 19px; color: #517061; font-size: 13px; font-weight: 800; }
+    .range-labels span:last-child { color: #849188; }
+    .status { min-height: 25px; margin: 14px 0 0; color: #63746b; font-size: 14px; text-align: center; }
+    .status strong { color: #205e44; }
+    .again { display: none; margin: 15px auto 0; padding: 10px 17px; border: 1px solid #1f6249; border-radius: 999px; background: #fffefa; color: #1f6249; font-weight: 800; }
+    .again:hover { background: #eaf3e9; }
+    .signed .again { display: block; }
+    .confetti { position: fixed; z-index: 5; width: 8px; height: 15px; left: var(--x); top: -20px; border-radius: 2px; background: var(--color); opacity: 0; pointer-events: none; animation: fall var(--duration) ease-in forwards; }
+    @keyframes fall { 10% { opacity: 1; } 100% { top: 110vh; opacity: 0; transform: translateX(var(--drift)) rotate(760deg); } }
+
+    @media (max-width: 680px) {
+      .page { display: block; padding: 20px 13px 30px; }
+      .subtitle { margin-bottom: 22px; }
+      .stage { grid-template-columns: minmax(108px, .68fr) minmax(0, 1.32fr); gap: 9px; }
+      .pen-card, .contract { min-height: 355px; }
+      .pen-card { border-radius: 17px; }
+      .card-top { padding: 17px 11px; }
+      .mini-label { font-size: 9px; }
+      .pen-title { margin-top: 8px; font-size: clamp(17px, 4vw, 25px); }
+      .pen-illustration { width: 108%; top: 53%; left: 52%; }
+      .pen-foot { padding: 0 10px 16px; font-size: 10px; }
+      .contract-wrap { padding: 6px; border-radius: 17px; }
+      .contract { padding: 15px 12px; border-radius: 12px; }
+      .contract::after { left: 8px; }
+      .brand { font-size: 10px; }
+      .doc-no { font-size: 8px; }
+      .rule { margin: 13px 0 18px; }
+      .contract h2 { font-size: clamp(17px, 4.6vw, 25px); }
+      .contract-copy { margin: 8px 0 16px; font-size: 11px; }
+      .salary-box { display: block; padding: 10px; }
+      .salary-box span:first-child { font-size: 9px; }
+      .salary-value { display: block; margin-top: 4px; font-size: clamp(19px, 5.2vw, 25px); }
+      .contract-lines { gap: 9px; margin-top: 17px; }
+      .contract-lines span { height: 6px; }
+      .sign-area { gap: 8px; }
+      .sign-line { font-size: 8px; }
+      .signature { min-width: 85px; min-height: 34px; font-size: 16px; }
+      .stamp { right: 13px; bottom: 67px; width: 73px; border-width: 3px; font-size: 11px; }
+      .control { margin-top: 12px; border-radius: 17px; }
+      .control-head { display: block; }
+      .hint { margin-top: 5px; text-align: left; }
+      .range-labels { font-size: 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="page">
+    <div class="app" id="app">
+      <p class="eyebrow">Trò đùa văn phòng • 100% hư cấu</p>
+      <h1>Ký hợp đồng lương</h1>
+      <p class="subtitle">Một chiếc bút, một bản hợp đồng, và một cú kéo khiến phòng nhân sự mỉm cười.</p>
+
+      <div class="stage">
+        <section class="pen-card" aria-label="Bút ký hợp đồng">
+          <div class="card-top">
+            <div class="mini-label">Bên trái • Công cụ ký</div>
+            <p class="pen-title">Chiếc bút<br>đang chờ…</p>
+          </div>
+          <svg class="pen-illustration" viewBox="0 0 330 330" role="img" aria-label="Minh họa cây bút máy">
+            <defs>
+              <linearGradient id="bodyGradient" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#101c1d"/><stop offset=".37" stop-color="#365453"/><stop offset=".7" stop-color="#19312f"/><stop offset="1" stop-color="#0b1718"/></linearGradient>
+              <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#af7c39"/><stop offset=".5" stop-color="#f9dfa2"/><stop offset="1" stop-color="#a66e32"/></linearGradient>
+            </defs>
+            <g transform="translate(166 165) rotate(44)">
+              <rect x="-20" y="-136" width="40" height="182" rx="14" fill="url(#bodyGradient)" stroke="#d7c392" stroke-width="2"/>
+              <rect x="-23" y="-137" width="46" height="22" rx="6" fill="url(#goldGradient)"/>
+              <rect x="-22" y="34" width="44" height="11" fill="url(#goldGradient)"/>
+              <rect x="-3" y="-112" width="5" height="104" rx="2" fill="#a5c0b5" opacity=".25"/>
+              <path d="M-20 46 L20 46 L11 98 Q0 115 -11 98 Z" fill="url(#goldGradient)" stroke="#785526" stroke-width="1.5"/>
+              <path d="M0 53 L0 108" stroke="#785526" stroke-width="2"/>
+              <circle cx="0" cy="80" r="4" fill="#684921"/>
+              <path d="M-3 104 L0 126 L3 104" fill="#1c2725"/>
+              <path d="M22 -114 Q44 -96 32 -35" fill="none" stroke="url(#goldGradient)" stroke-width="6" stroke-linecap="round"/>
+            </g>
+          </svg>
+          <p class="pen-foot">Mực đã sẵn sàng.<br>Kéo lương để xem phép màu.</p>
+        </section>
+
+        <section class="contract-wrap" aria-label="Bản hợp đồng">
+          <div class="contract">
+            <div class="contract-head"><span class="brand">CÔNG TY RẤT VUI</span><span class="doc-no">HĐLĐ / 2026 / 001</span></div>
+            <div class="rule"></div>
+            <h2>HỢP ĐỒNG<br>LAO ĐỘNG</h2>
+            <p class="contract-copy">Điều 1. Hai bên vui vẻ thỏa thuận mức lương hàng tháng như sau:</p>
+            <div class="salary-box"><span>Lương đề xuất</span><strong class="salary-value" id="salaryValue">100 triệu</strong></div>
+            <div class="contract-lines" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="sign-area"><span class="sign-line">Đại diện công ty</span><span class="signature" aria-hidden="true">Đã ký ✓</span></div>
+            <div class="stamp" aria-hidden="true">Ký hợp<br>đồng<br>thành công</div>
+          </div>
+        </section>
+      </div>
+
+      <section class="control" aria-labelledby="salaryLabel">
+        <div class="control-head"><h2 id="salaryLabel">Kéo để thương lượng lương</h2><span class="hint" id="hint">Bắt đầu từ bên phải → kéo hết sang trái</span></div>
+        <div class="range-wrap"><input id="salarySlider" type="range" min="5" max="100" step="1" value="100" aria-label="Mức lương, đơn vị triệu đồng" style="--progress: 100%"></div>
+        <div class="range-labels"><span>5 triệu · ký ngay</span><span>100 triệu · đang đàm phán</span></div>
+        <p class="status" id="status" role="status" aria-live="polite">Phòng nhân sự đang nín thở chờ bạn kéo thanh lương…</p>
+        <button class="again" id="again" type="button">Thương lượng lại ↻</button>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const app = document.getElementById('app');
+    const slider = document.getElementById('salarySlider');
+    const salaryValue = document.getElementById('salaryValue');
+    const status = document.getElementById('status');
+    const hint = document.getElementById('hint');
+    const again = document.getElementById('again');
+    let celebrated = false;
+
+    function confetti() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const colors = ['#d9b052', '#2b7658', '#d8775d', '#8eac85', '#f2dfb6'];
+      for (let i = 0; i < 34; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti';
+        piece.style.setProperty('--x', `${Math.random() * 100}vw`);
+        piece.style.setProperty('--color', colors[i % colors.length]);
+        piece.style.setProperty('--duration', `${2 + Math.random() * 1.5}s`);
+        piece.style.setProperty('--drift', `${(Math.random() - .5) * 220}px`);
+        document.body.appendChild(piece);
+        piece.addEventListener('animationend', () => piece.remove(), { once: true });
+      }
+    }
+
+    function update() {
+      const value = Number(slider.value);
+      const signed = value === 5;
+      slider.style.setProperty('--progress', `${((value - 5) / 95) * 100}%`);
+      salaryValue.textContent = `${value} triệu`;
+      app.classList.toggle('signed', signed);
+      if (signed) {
+        status.innerHTML = '<strong>🎉 Ký hợp đồng thành công!</strong> Mức lương: 5 triệu/tháng.';
+        hint.textContent = 'Phòng nhân sự đã bấm nút đồng ý trong 0,001 giây.';
+        if (!celebrated) confetti();
+      } else if (value < 100) {
+        status.textContent = `Còn ${value - 5} triệu nữa là hợp đồng tự ký!`;
+        hint.textContent = 'Tiếp tục kéo sang trái ←';
+      } else {
+        status.textContent = 'Phòng nhân sự đang nín thở chờ bạn kéo thanh lương…';
+        hint.textContent = 'Bắt đầu từ bên phải → kéo hết sang trái';
+      }
+      celebrated = signed;
+    }
+
+    slider.addEventListener('input', update);
+    again.addEventListener('click', () => { slider.value = '100'; update(); slider.focus(); });
+    update();
+  </script>
+</body>
+</html>
